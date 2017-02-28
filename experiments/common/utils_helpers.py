@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import dataset_utils as du
 
@@ -21,21 +22,33 @@ def generate_1000_genomes_hist(transpose=False, label_splits=None,
 
     nolabel_y = nolabel_y.argmax(axis=1)
 
-    path = '/data/lisatmp4/romerosa/datasets/1000_Genome_project/'
+    # path = '/data/lisatmp4/' + os.environ["USER"] + '/datasets/1000_Genome_project/'
+    path = '/Tmp/' + os.environ["USER"] + '/datasets/1000_Genome_project/'
 
     filename = 'unsupervised_hist_3x26' if perclass else \
         'unsupervised_hist_3'
     filename += '_fold' + str(fold) + '.npy'
 
     if perclass:
+        # the first dimension of the following is length 'number of snps'
         nolabel_x = np.zeros((nolabel_orig.shape[0], 3*26))
         for i in range(nolabel_x.shape[0]):
-            for j in range(nolabel_x.shape[1]):
-                nolabel_x[i, nolabel_y[j]*3:nolabel_y[j]*3+3] += \
-                    np.bincount(nolabel_orig[i, :].astype('int32'),
-                                minlength=3)
-                nolabel_x[i, nolabel_y[j]*3:nolabel_y[j]*3+3] /= \
-                    nolabel_x[i, nolabel_y[j]*3:nolabel_y[j]*3+3].sum()
+            if i % 5000 == 0:
+                print "processing snp no: ", i
+            for j in range(26):
+                #  whaaatt!!!
+                nolabel_x[i, j*3:j*3+3] += \
+                    np.bincount(nolabel_orig[i, nolabel_y == j ].astype('int32'), minlength=3)
+                # nolabel_x[i, nolabel_y[j]*3:nolabel_y[j]*3+3] += \
+                #    np.bincount(nolabel_orig[i,:].astype('int32'), minlength=3)
+                # print np.bincount(nolabel_orig[i,:].astype('int32'), minlength=3) 
+                nolabel_x[i, j*3:j*3+3] /= \
+                    nolabel_x[i, j*3:j*3+3].sum()
+            # print nolabel_orig[0,:].shape
+            # print nolabel_orig[0,:].sum()
+            # print nolabel_y
+            # print zip(np.sum(nolabel_x[0,:].reshape(26,3), axis=1), np.bincount(nolabel_y.astype('int32')))
+            # print nolabel_x[0,:].reshape(26,3)
     else:
         nolabel_x = np.zeros((nolabel_orig.shape[0], 3))
         for i in range(nolabel_x.shape[0]):
@@ -91,7 +104,7 @@ def generate_1000_genomes_snp2bin(transpose=False, label_splits=None,
     nolabel_x = np.zeros((nolabel_orig.shape[0], nolabel_orig.shape[1]*2),
                          dtype='uint8')
 
-    path = '/data/lisatmp4/romerosa/datasets/1000_Genome_project/'
+    path = '/data/lisatmp4/' + os.environ["USER"] + '/datasets/1000_Genome_project/'
     filename = 'unsupervised_snp_bin_fold' + str(fold) + '.npy'
 
     # SNP to bin
@@ -102,7 +115,8 @@ def generate_1000_genomes_snp2bin(transpose=False, label_splits=None,
 
 
 if __name__ == '__main__':
-    for f in range(5):
-        print(str(f))
-        generate_1000_genomes_hist(transpose=False, label_splits=[.75],
-                                   feature_splits=[1.], fold=f, perclass=True)
+    # for f in range(5):
+    f = int(sys.argv[1])
+    print(str(f))
+    generate_1000_genomes_hist(transpose=False, label_splits=[.75],
+                               feature_splits=[1.], fold=f, perclass=True)

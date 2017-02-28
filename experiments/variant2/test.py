@@ -34,8 +34,8 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             encoder_net_init=0.2, decoder_net_init=0.2, keep_labels=1.0,
             prec_recall_cutoff=True, missing_labels_val=-1.0, which_fold=0,
             early_stop_criterion='loss_sup_det', embedding_input='raw',
-            model_path='/Tmp/romerosa/feature_selection/newmodel/',
-            save_path='/Tmp/romerosa/feature_selection/',
+            model_path='/Tmp/' + os.environ["USER"] + '/feature_selection/newmodel/',
+            save_path='/Tmp/' + os.environ["USER"] + '/feature_selection/',
             dataset_path='/Tmp/' + os.environ["USER"] + '/datasets/',
             resume=False, exp_name=''):
 
@@ -198,7 +198,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
                              on_unused_input='ignore')
 
 
-    # Finally, launch the training loop.
+    # Finally, launch the testing loop.
     print("Starting testing...")
     test_minibatches = mlh.iterate_minibatches(x_test, y_test, batch_size,
                                                shuffle=False)
@@ -258,7 +258,7 @@ def main():
                         default=[100],
                         help='List of supervised hidden units.')
     parser.add_argument('--embedding_source',
-                        default='/data/lisatmp4/romerosa/datasets/1000_Genome_project/unsupervised_hist_3x26_fold0.npy',
+                        default='/data/lisatmp4' + os.environ["USER"] + '/datasets/1000_Genome_project/unsupervised_hist_3x26_fold0.npy',
                         # '/data/lisatmp4/romerosa/feature_selection/1000_genomes/kmeans_10_embedding.npy',
                         help='Source for the feature embedding. Either' +
                              'None or the name of a file from which' +
@@ -342,7 +342,7 @@ def main():
                         default='/data/lisatmp4/'+ os.environ["USER"]+'/feature_selection/',
                         help='Path to save results.')
     parser.add_argument('--dataset_path',
-                        default='/data/lisatmp4/romerosa/datasets/1000_Genome_project/',
+                        default='/data/lisatmp4/'+ os.environ["USER"]+'/datasets/1000_Genome_project/',
                         help='Path to dataset')
     parser.add_argument('-resume',
                         type=bool,

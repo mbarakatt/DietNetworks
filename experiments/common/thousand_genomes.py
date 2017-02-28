@@ -1,13 +1,14 @@
 import cPickle as pickle
 import numpy
 import os
+import gzip
 
 
-def load_data(path="/Tmp/carriepl/Genomics_Datasets/1000_Genome_project/",
+def load_data(path="/Tmp/barakatm/1000_Genome_project/",
               force_pkl_recreation=False):
 
-    dataset_file = "affy_6_biallelic_snps_maf005_thinned_aut_dataset.pkl"
-    genome_file = "affy_6_biallelic_snps_maf005_thinned_aut_A.raw"
+    dataset_file = "affy_6_biallelic_snps_maf005_thinned_aut_imputed_dataset.pkl"
+    genome_file = "affy_6_biallelic_snps_maf005_thinned_aut_imputed_A.raw.gz"
     label_file = "affy_samples.20141118.panel"
     
     if os.path.exists(path + dataset_file) and not force_pkl_recreation:
@@ -19,7 +20,7 @@ def load_data(path="/Tmp/carriepl/Genomics_Datasets/1000_Genome_project/",
           "be parsed to produce one. This will take a few minutes.")
     
     # Load the genomic data file
-    with open(path + genome_file, "r") as f:
+    with gzip.open(path + genome_file, "r") as f:
         lines = f.readlines()[1:]
     headers = [l.split()[:6] for l in lines]
     

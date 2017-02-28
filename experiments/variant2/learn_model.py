@@ -1,9 +1,14 @@
-#!/usr/bin/env python
+# Don't use the env version version
+###!/usr/bin/env python
+
 from __future__ import print_function
 import argparse
 import time
 import os
 from distutils.dir_util import copy_tree
+
+import sys 
+print(sys.version) # Printing which version of python is being used
 
 import lasagne
 from lasagne.regularization import apply_penalty, l2
@@ -28,8 +33,8 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             encoder_net_init=0.2, decoder_net_init=0.2, keep_labels=1.0,
             prec_recall_cutoff=True, missing_labels_val=-1.0, which_fold=0,
             early_stop_criterion='loss_sup_det', embedding_input='raw',
-            save_path='/Tmp/romerosa/feature_selection/newmodel/',
-            save_copy='/Tmp/romerosa/feature_selection/',
+            save_path='/Tmp/' + os.environ["USER"] + '/savepath/', # a default value was needed?
+            save_copy='/Tmp/' + os.environ["USER"] + '/savecopy/',  
             dataset_path='/Tmp/' + os.environ["USER"] + '/datasets/',
             resume=False, exp_name='', random_proj=0):
 
@@ -326,6 +331,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
             np.savez(save_path + "/errors_supervised_last.npz",
                      zip(*train_monitored), zip(*valid_monitored))
 
+
         # End training
         if patience == max_patience or epoch == num_epochs-1:
             print("Ending training")
@@ -366,6 +372,7 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
 
                 test_err = mlh.monitoring(test_minibatches, "test", val_fn,
                                           monitor_labels, prec_recall_cutoff)
+		np.savez(os.path.join(save_path, 'final_errors.npz'), test_err)
             else:
                 for minibatch in mlh.iterate_testbatches(x_test,
                                                          138,
@@ -385,8 +392,10 @@ def execute(dataset, n_hidden_u, n_hidden_t_enc, n_hidden_t_dec, n_hidden_s,
         # Anneal the learning rate
         lr.set_value(float(lr.get_value() * learning_rate_annealing))
 
-    # Print all final errors for train, validation and test
+    # Print and save all final errors for train, validation and test
     print("Training time:\t\t\t{:.3f}s".format(time.time() - start_training))
+    print("test_err:", test_err)
+
 
     # Copy files to loadpath
     if save_path != save_copy:
@@ -422,7 +431,7 @@ def main():
     parser.add_argument('--num_epochs',
                         '-ne',
                         type=int,
-                        default=500,
+                        default=1,
                         help="""Int to indicate the max'
                         'number of epochs.""")
     parser.add_argument('--learning_rate',
@@ -500,7 +509,7 @@ def main():
                             '$SCRATCH'+'/feature_selection/',
                         help='Path to save results.')
     parser.add_argument('--dataset_path',
-                        default='/data/lisatmp4/romerosa/datasets/1000_Genome_project/' if not CLUSTER else '/scratch/jvb-000-aa/tisu32/1000_Genome_project/',
+                        default='/data/lisatmp4/' + os.environ["USER"] +  '/datasets/1000_Genome_project/' if not CLUSTER else '/scratch/jvb-000-aa/tisu32/1000_Genome_project/',
                         help='Path to dataset')
     parser.add_argument('-resume',
                         type=bool,

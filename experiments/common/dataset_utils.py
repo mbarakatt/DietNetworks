@@ -1,13 +1,14 @@
 import numpy
 import os
 """
-from feature_selection.experiments.common import (protein_loader, dorothea,
+#from feature_selection.experiments.common import (protein_loader, dorothea,
                                                   reuters, imdb, iric_molecules,
                                                   thousand_genomes)
 """
-from feature_selection.experiments.common import thousand_genomes
+# from feature_selection.experiments.common import thousand_genomes
+import thousand_genomes
 
-from feature_selection import aggregate_dataset as opensnp
+# from feature_selection import aggregate_dataset as opensnp
 
 
 def shuffle(data_sources, seed=23):
@@ -164,8 +165,7 @@ def load_iric_molecules(transpose=False, splits=None):
 def load_1000_genomes_old(transpose=False, label_splits=None, feature_splits=None,
                           fold=0, norm=True):
 
-    # user = os.getenv("USER")
-    path = "/data/lisatmp4/romerosa/datasets/1000_Genome_project/"  # % user
+    path = '/data/lisatmp4/' + os.environ["USER"] + '/datasets/1000_Genome_project/'  # % user
     x, y = thousand_genomes.load_data(path)
     x = x.astype("float32")
 
@@ -201,10 +201,9 @@ def load_1000_genomes_old(transpose=False, label_splits=None, feature_splits=Non
 
 def load_1000_genomes(transpose=False, label_splits=None, feature_splits=None,
                       nolabels='raw', fold=0, norm=True,
-                      path="/data/lisatmp4/romerosa/datasets/1000_Genome_project/" ):
+                      path="/data/lisatmp4/" + os.environ["USER"] + "/datasets/1000_Genome_project/" ):
 
-    # user = os.getenv("USER")
-    print path
+    print "LOAD_1000_genome PATH is: ", path
 
     if nolabels == 'raw' or not transpose:
         # Load raw data either for supervised or unsupervised part
